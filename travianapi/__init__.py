@@ -1,6 +1,8 @@
 import os
 import logging
 
+__tuple_version__ = (0, 1, 0)
+__version__ '.'.join(__tuple_version__)
 
 if not os.path.isdir('log'):
     os.makedirs('log')
