@@ -4,6 +4,7 @@ import re
 import bs4
 
 from ...travparse import parsebuild
+from ... import language
 from . import building
 
 
@@ -84,20 +85,19 @@ class Marketplace(building.Building):
             bid = {}
             elements = row.find_all('td')
             f1 = int(elements[0].text.strip())
-            f1_type_name = elements[0].find('img')['alt']
-            f1_type = self.village_part.login.language.resource_to_int(f1_type_name)
-            bid['offering'] = (f1, f1_type)
+            # f1_type_name = elements[0].find('img')['alt']
+            rid = int(elements[0].find('img')['class'][0][1:]) - 1
+            # f1_type = self.village_part.login.language.resource_to_int(f1_type_name)
+            bid['offering'] = (f1, rid)
             relation = float(elements[1].text.strip())
             bid['relation'] = relation
             f2 = int(elements[2].text.strip())
-            f2_type_name = elements[2].find('img')['alt']
-            f2_type = self.village_part.login.language.resource_to_int(f2_type_name)
-            bid['searching'] = (f2, f2_type)
+            rid = int(elements[0].find('img')['class'][0][1:]) - 1
+            bid['searching'] = (f2, rid)
             player = elements[3].find('a').text
             bid['player'] = player
             time = elements[4].text.strip()
             bid['time'] = time
-            #print(elements[5]['class'])
             biddings.append(bid)
         return biddings
 

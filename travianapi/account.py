@@ -14,12 +14,16 @@ from . import map
 class Account(eventmachine.EventMachine):
     """ Основной класс API. Агрегирует весь функционал """
 
-    def __init__(self, url, name, password, headers={}):
+    def __init__(self, url, name, password, headers=None):
         super().__init__()
-        self.login = login.Login(url, name, password, headers)  # Агрегируем объект для взаимодействия с сервером
-        self.language = self.login.language
+
+        # Агрегируем объект для взаимодействия с сервером
+        self.login = login.Login(url, name, password, headers)
+
         self.__villages = {}  # id: village
-        self.nation = nations.NATIONS[self.nation_id-1]
+        self._nation_id = None
+        self._nation = None
+
         self.map = map.Map(self)  # Агрегируем объект для работы с картой
         self.reports = reports.Reports(self)  # Агрегируем обект для работы с отчетами
 
@@ -59,10 +63,18 @@ class Account(eventmachine.EventMachine):
     population = property(get_population)
 
     def get_nation_id(self):
-        html = self.login.get_html("dorf1.php")
-        soup = bs4.BeautifulSoup(html, 'html5lib')
-        return dorf1.parse_nation_id(soup)
+        if self._nation_id is None:
+            html = self.login.get_html("dorf1.php")
+            soup = bs4.BeautifulSoup(html, 'html5lib')
+            self._nation_id =  dorf1.parse_nation_id(soup)
+        return self._nation
     nation_id = property(get_nation_id)
+
+    def get_nation(self):
+        if self._nation:
+            self._nation = nations.NATIONS[self.nation_id - 1]
+        return self._nation
+    nation = property(get_nation)
 
     def update_villages(self):
         villages_data = self._load_villages_data()

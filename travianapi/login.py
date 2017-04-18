@@ -8,12 +8,20 @@ from .exceptions import LoginError
 from . import language
 from .travparse import dorf1
 
+BASE_HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101 Firefox/52.0'
+}
+
 
 class Login:
-    def __init__(self, url, name, password, headers={}, lang_dir='data/language/'):
+    def __init__(self, url, name, password, headers=None):
         self.url = url
         self.name = name
         self.password = password
+
+        if not headers:
+            headers = BASE_HEADERS
+
         self.__headers = headers
 
         self.session = None
@@ -29,7 +37,6 @@ class Login:
 
         self.__server_language = None
         self.__game_version = None
-        self.language = language.Language("{}{}.json".format(lang_dir, self.server_language))
 
     def new_session(self):
         if self.session:

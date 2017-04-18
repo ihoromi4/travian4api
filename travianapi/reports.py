@@ -27,18 +27,27 @@ report_types = [
 
 
 class Reports:
-    def __init__(self, account):
+    def __init__(self, account: object):
         self.account = account
         self.login = account.login
-        # ---
+
+    def get_words(self):
+        """ Достает из страницы отчетов слова-маркеры """
+
         html = self.login.server_get('berichte.php')
         soup = bs4.BeautifulSoup(html, 'html5lib')
-        button_submit = soup.find('button', {'name': 'del'})
-        self.word_delete = button_submit['value']
-        button_submit = soup.find('button', {'name': 'mark_as_read'})
-        self.word_mark_as_read = button_submit['value']
 
-    def mark_readed_report(self, id: int, toggle_state:int = 0):
+        data = {}
+
+        button_submit = soup.find('button', {'name': 'del'})
+        data['word_delete'] = button_submit['value']
+
+        button_submit = soup.find('button', {'name': 'mark_as_read'})
+        data['word_mark_as_read'] = button_submit['value']
+
+        return data
+
+    def mark_readed_report(self, id: int, toggle_state: int = 0):
         self.login.server_get('berichte.php', params={'id': id, 's': 0, 'toggleState': toggle_state})
 
     def delete_report(self, id: int):
@@ -67,7 +76,7 @@ class Reports:
             return
         data = {
             'page': 1,
-            'del': self.word_delete,
+            'del': self.get_words()['word_delete'],
             's': '1'
         }
         for tr_report in tr_reports:
@@ -89,7 +98,7 @@ class Reports:
             return
         data = {
             'page': 1,
-            'mark_as_read': self.word_mark_as_read,
+            'mark_as_read': self.get_words()['word_mark_as_read'],
             's': '1'
         }
         for tr_report in tr_reports:

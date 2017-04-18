@@ -2,6 +2,7 @@ import re
 
 import bs4
 
+from .. import language
 from . import buildings
 
 
@@ -37,8 +38,7 @@ class OuterVillage:
             id = field_info['id']
             type_index = field_info['type']
             level = field_info['level']
-            repr = self.village.account.language.index_to_building_repr(type_index)
-            # self.village.account.language.data["buildings"].get(name, "")
+            repr = language.index_to_building_repr(type_index)
             building_type = buildings.get_building_type(repr)
             field = building_type(self, name, id, level)
             self._buildings[id] = field
