@@ -1,0 +1,60 @@
+
+class Login
+    void __init__()
+    bool login()
+    dict get_info()
+
+class Account
+    villeges : list
+
+class Village
+    id : int
+    name : str
+    warehouse : int
+    granary : int
+    external : ExternalVillage
+    inside : InsideVillage
+
+    void __init__(id:int, pos:tuple, name:str)
+
+class ExternalVillage
+    void __init__(login:Login)
+    list get_buildings()
+    dict build_info(id:int)
+    void build(id:int, type:int)
+
+class InsideVillage
+    void __init__(login:Login)
+    list get_buildings()
+    dict build_info(id:int)
+    void build(id:int, type:int)
+
+class Building
+    void __init__()
+    dict get_info()
+    void build()
+
+
+Принцип работы:
+
+Создаем обьект 'Login':
+login = Login(name, password)
+
+Вход произойдет автоматически при запросе определенной страницы или информации.
+Все последующие запросы к серверу будут происходить через обьект 'Login'.
+
+Создаем объект 'Account' с аргументом 'login':
+account = Account(login)
+
+Класс 'Account' предназначен для работы со всеми данными учетной записи.
+
+Чтобы получить имя пользователя:
+account.login.name
+
+Чтобы получить пароль пользователя:
+account.login.password
+
+Чтобы получить информацию о деревнях используем список:
+account.villages
+
+Елементы этого списка экземпляры класса 'Village'.
