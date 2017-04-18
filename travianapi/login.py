@@ -1,20 +1,12 @@
 import logging
 import time
-import re
 
 import requests
 import bs4
 
+from .exceptions import LoginError
 from . import language
-
 from .travparse import dorf1
-
-
-logging.debug('Start loading travlib/loging.py')
-
-
-class LoginError(Exception):
-    pass
 
 
 class Login:
@@ -222,5 +214,3 @@ class Login:
             self.__server_language = dorf1.parse_server_language(html)
         return self.__server_language
     server_language = property(get_server_language)
-
-logging.debug('End loading travlib/loging.py')

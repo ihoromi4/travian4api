@@ -11,4 +11,4 @@ logging.basicConfig(format='%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(as
                     level=logging.DEBUG),
                     #filename='log/log.log')
 
-logging.debug('Start logging')
+logging.debug('Travian Legends API version: ' + __version__)
