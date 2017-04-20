@@ -18,6 +18,8 @@ REQUEST_MAX_TRIES = 2
 
 
 class Login:
+    """ Класс реализует подключение к серверу и вход в аккаунт """
+
     def __init__(self, url, name, password, headers=None):
         self.url = url
         self.name = name
@@ -56,13 +58,16 @@ class Login:
         self.session.headers = headers
     headers = property(get_headers, set_headers)
 
-    def request(self, method: str, url: str, data: dict={}, params: dict={}):
+    def request(self, method: str, url: str, data: dict={}, params: dict={}) -> object:
         """
             Отправляет серверу get или post запрос.
             В случае нудачи повторяет REQUEST_MAX_TRIES раз.
+            К адресу присоединяет слева адрес сервера.
+            Возвращает объект типа requests.Response
         """
 
         response = None
+        url = self.url + url
 
         for attempt in range(1, REQUEST_MAX_TRIES + 1):
             try:
@@ -89,13 +94,19 @@ class Login:
 
         return response
 
-    def get(self, url, data={}, params={}):
+    def get(self, url: str, data: dict={}, params: dict={}):
+        """ Отправляет серверу get запрос """
         return self.request('get', url, data, params)
 
-    def post(self, url, data={}, params={}):
+    def post(self, url: str, data: dict={}, params: dict={}) -> object:
+        """ Отправляет серверу post запрос """
         return self.request('post', url, data, params)
 
-    def send_request(self, url, data={}, params={}):
+    def send_request(self, url: str, data: dict={}, params: dict={}) -> object:
+        """
+            Отправляет серверу get запрос если нет данных (data),
+            иначе отправляет post запрос.
+        """
         if not len(data):
             response = self.get(url, data=data, params=params)
         else:
@@ -103,16 +114,16 @@ class Login:
         return response
 
     def server_get(self, url, data={}, params={}):
-        return self.get(self.url + url, data, params).text
+        return self.get(url, data, params).text
 
     def server_post(self, url, data={}, params={}):
-        return self.post(self.url + url, data, params).text
+        return self.post(url, data, params).text
 
     def server_get_request(self, url, data={}, params={}, *args, **kwargs):
-        return self.get(self.url + url, data, params, *args, **kwargs)
+        return self.get(url, data, params, *args, **kwargs)
 
     def server_post_request(self, url, data={}, params={}, *args, **kwargs):
-        return self.post(self.url + url, data, params, *args, **kwargs)
+        return self.post(url, data, params, *args, **kwargs)
 
     def login(self) -> None:
         """
@@ -192,24 +203,30 @@ class Login:
 
         return response.text
 
-    def get_html(self, last_url, params={}, data={}):
-        url = self.url + last_url
+    def get_html(self, url: str, params: dict={}, data: dict={}) -> str:
+        """ Загружает страницу и сохраняет ее в буффер """
+
         key = (url, hash(tuple(sorted(params.items()))))
+
         if key in self.html_sources:
             html, load_time = self.html_sources[key]
             if time.time() - load_time < self.html_obsolescence_time:
                 print("{} : no obsolescence html".format(url))
                 return html
+
         load_time = time.time()
         html = self.load_html(url, params=params, data=data)
         self.html_sources[key] = (html, load_time)
+
         return html
 
-    def load_dorf1(self, village_id):
-        return self.get_html('dorf1.php?newdid={}&'.format(village_id))
+    def load_dorf1(self, village_id: int) -> str:
+        params = {'newdid': village_id}
+        return self.get_html('dorf1.php', params=params)
 
-    def load_dorf2(self, village_id):
-        return self.get_html('dorf2.php?newdid={}&'.format(village_id))
+    def load_dorf2(self, village_id: int) -> str:
+        params = {'newdid': village_id}
+        return self.get_html('dorf2.php', params=params)
 
     def get_game_version(self):
         if not self.__game_version:
