@@ -49,8 +49,9 @@ DICT_INDEX_TO_BUILDING = dict(BUILDINGS_REPR)
 
 def index_to_building_repr(index: int) -> str:
     """ Принимает идентификатор ГРАФИКИ постройки. Возвращает внутреннее представление """
-    repr = DICT_INDEX_TO_BUILDING.get(index, '')
-    if not repr:
-        logging.error('Language building repr no has key: {}'.format(index))
-        repr = DICT_INDEX_TO_BUILDING[-1]
-    return repr
+
+    if index in DICT_INDEX_TO_BUILDING:
+        return DICT_INDEX_TO_BUILDING[index]
+    else:
+        logging.warning('Language building repr no has key: {}, will be use key -1: class Building'.format(index))
+        return DICT_INDEX_TO_BUILDING[-1]
