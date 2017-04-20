@@ -14,6 +14,8 @@ BASE_HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101 Firefox/52.0'
 }
 
+REQUEST_MAX_TRIES = 2
+
 
 class Login:
     def __init__(self, url, name, password, headers=None):
@@ -54,64 +56,44 @@ class Login:
         self.session.headers = headers
     headers = property(get_headers, set_headers)
 
-    def get(self, url, data={}, params={}):
-        MAXTRIES = 2
-        response = None
-        for attempt in range(1, MAXTRIES + 1):
-            try:
-                logger.debug('Send get request to url: {}'.format(url))
-                response = self.session.get(url, params=params, timeout=self.timeout)
-                break
-            except requests.exceptions.ConnectionError:
-                print('Attempt %s of %s' % (attempt, MAXTRIES))
-                self.new_session()
-                self.login()
-            except requests.exceptions.ReadTimeout:
-                print('Attempt %s of %s' % (attempt, MAXTRIES))
-                self.new_session()
-                self.login()
-            except:
-                raise
-        if response:
-            status_code = response.status_code
-            if hasattr(response, 'is_redirect'):
-                is_redirect = response.is_redirect
-            else:
-                is_redirect = None
-            logging.debug('Response: status_code: {}, is_redirect {}'.format(status_code, is_redirect))
-        else:
-            raise ValueError('response must be not None')
-        return response
+    def request(self, method: str, url: str, data: dict={}, params: dict={}):
+        """
+            Отправляет серверу get или post запрос.
+            В случае нудачи повторяет REQUEST_MAX_TRIES раз.
+        """
 
-    def post(self, url, data={}, params={}):
-        MAXTRIES = 2
         response = None
-        for attempt in range(1, MAXTRIES + 1):
+
+        for attempt in range(1, REQUEST_MAX_TRIES + 1):
             try:
-                logging.debug('Send post request to url: {}'.format(url))
-                response = self.session.post(url, params=params, data=data, timeout=self.timeout)
+                logger.debug('Send {} request to url: {}'.format(method, url))
+                if method == 'get':
+                    response = self.session.get(url, params=params, timeout=self.timeout)
+                elif method == 'post':
+                    response = self.session.post(url, params=params, data=data, timeout=self.timeout)
                 break
             except requests.exceptions.ConnectionError:
-                print('Attempt %s of %s' % (attempt, MAXTRIES))
+                print('Attempt %s of %s' % (attempt, REQUEST_MAX_TRIES))
                 self.new_session()
                 self.login()
             except requests.exceptions.ReadTimeout:
-                print('Attempt %s of %s' % (attempt, MAXTRIES))
+                print('Attempt %s of %s' % (attempt, REQUEST_MAX_TRIES))
                 self.new_session()
                 self.login()
             except:
                 logging.error('Net problem, cant fetch the URL {}'.format(url))
                 raise
-        if response:
-            status_code = response.status_code
-            if hasattr(response, 'is_redirect'):
-                is_redirect = response.is_redirect
-            else:
-                is_redirect = None
-            logging.debug('Response: status_code: {}, is_redirect {}'.format(status_code, is_redirect))
-        else:
+
+        if not response:
             raise ValueError('response must be not None')
+
         return response
+
+    def get(self, url, data={}, params={}):
+        return self.request('get', url, data, params)
+
+    def post(self, url, data={}, params={}):
+        return self.request('post', url, data, params)
 
     def send_request(self, url, data={}, params={}):
         if not len(data):
