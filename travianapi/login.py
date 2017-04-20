@@ -8,6 +8,8 @@ from .exceptions import LoginError
 from . import language
 from .travparse import dorf1
 
+logger = logging.getLogger(__name__)
+
 BASE_HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101 Firefox/52.0'
 }
@@ -57,7 +59,7 @@ class Login:
         response = None
         for attempt in range(1, MAXTRIES + 1):
             try:
-                logging.debug('Send get request to url: {}'.format(url))
+                logger.debug('Send get request to url: {}'.format(url))
                 response = self.session.get(url, params=params, timeout=self.timeout)
                 break
             except requests.exceptions.ConnectionError:
@@ -130,17 +132,28 @@ class Login:
     def server_post_request(self, url, data={}, params={}, *args, **kwargs):
         return self.post(self.url + url, data, params, *args, **kwargs)
 
-    def login(self):
-        logging.debug('Start Login')
+    def login(self) -> None:
+        """
+            Метод производит вход в аккаунт.
+            После входа сессия остается открытой до отключения
+            или закрытия соединения.
+        """
+
+        logger.debug('Start Login to server {}'.format(self.url))
+
         response = self.session.get(self.url)
+
         if response.status_code != 200:
+            logger.debug('Login failed')
             return False
+
         html = response.text
-        # start parse
         parser = bs4.BeautifulSoup(html, 'html5lib')
+
+        # извлекаем из страницы переменные нужные для входа
         s1 = parser.find('button', {'name': 's1'})['value'].encode('utf-8')
         login = parser.find('input', {'name': 'login'})['value']
-        # start login
+
         data = {
             'name': self.name,
             'password': self.password,
@@ -149,19 +162,26 @@ class Login:
             'login': login
             }
         response = self.session.post(self.url + 'dorf1.php', data=data)
+
         if response.status_code != 200:
+            logger.debug('Login failed')
             return False
+
         html = response.text
+
+        # вхождение подстроки в html - маркер выполнения входа
         if 'playerName' in html:
             self.loggedin = True
+            # извлекаем токен для использования ajax:
             self.ajax_token = dorf1.parse_ajax_token(html)
-            logging.debug('Login succeed')
+            logger.debug('Login to server {} succeed'.format(self.url))
             return True
+
         self.loggedin = False
-        logging.debug('Login fail')
+        logger.debug('Login failed')
         return False
 
-    def load_html(self, url, params={}, data={}):
+    def load_html(self, url: str, params: dict={}, data: dict={}) -> str:
         if not self.loggedin:
             if not self.login():
                 logging.debug('Can\'t login. Something is wrong.')
@@ -181,12 +201,14 @@ class Login:
 
     def get_ajax(self, params: dict={}, data: dict={}) -> str:
         """ Выполняет ajax запрос и возвращает результат """
+
         last_url = 'ajax.php'  # Адрес для ajax запросов постоянный
         url = self.url + last_url
-        data['ajaxToken'] = self.ajax_token  # В данных должен быть ajax_token, добавляем.
+        data['ajaxToken'] = self.ajax_token  # В данных должен быть ajax_token, добавляем
+
         response = self.post(url, data=data, params=params)  # Нужен именно post запрос
-        html = response.text
-        return html
+
+        return response.text
 
     def get_html(self, last_url, params={}, data={}):
         url = self.url + last_url
