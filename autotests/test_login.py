@@ -4,24 +4,26 @@ import sys
 import unittest
 
 from travianapi import login
-# from travlib import account
 
 
 class TestLogin(unittest.TestCase):
-    def test_1(self):
-        server_url = 'http://ts5.travian.ru'
-        name = 'broo'
-        password = '1994igor'
-        headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0'}
+    def __init__(self, data):
+        unittest.TestCase.__init__(self)
 
-        login_ = login.Login(server_url, name, password, headers)
+        self.data = data
+
+    def runTest(self):
+        url = self.data['url']
+        name = self.data['username']
+        password = self.data['password']
+
+        login_ = login.Login(url, name, password)
 
         login_.login()
-        print(1)
 
-        self.assertEqual(login_.server_url, server_url)
+        self.assertEqual(login_.url, url)
         self.assertEqual(login_.name, name)
         self.assertEqual(login_.password, password)
-        self.assertEqual(login_.headers, headers)
 
-unittest.main()
+if __name__ == '__main__':
+    unittest.main()

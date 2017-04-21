@@ -30,8 +30,7 @@ class Login:
 
         self.__headers = headers
 
-        self.session = None
-        self.new_session()
+        self.session = self.new_session()
 
         self.timeout = 5.0
         self.relogin_delay = 0.33
@@ -44,11 +43,16 @@ class Login:
         self.__server_language = None
         self.__game_version = None
 
-    def new_session(self):
-        if self.session:
+    @staticmethod
+    def _get_session() -> object:
+        return requests.Session()
+
+    def new_session(self) -> object:
+        if getattr(self, 'session', None):
             self.session.close()
-        self.session = requests.Session()
+        self.session = self._get_session()
         self.session.headers = self.__headers
+        return self.session
 
     def get_headers(self):
         return self.__headers
