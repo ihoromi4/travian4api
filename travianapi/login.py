@@ -62,7 +62,7 @@ class Login:
         self.session.headers = headers
     headers = property(get_headers, set_headers)
 
-    def request(self, method: str, url: str, data: dict={}, params: dict={}) -> object:
+    def request(self, method: str, url: str, data: dict={}, params: dict={}) -> requests.Response:
         """
             Отправляет серверу get или post запрос.
             В случае нудачи повторяет REQUEST_MAX_TRIES раз.
@@ -98,15 +98,15 @@ class Login:
 
         return response
 
-    def get(self, url: str, data: dict={}, params: dict={}):
+    def get(self, url: str, data: dict={}, params: dict={}) -> requests.Response:
         """ Отправляет серверу get запрос """
         return self.request('get', url, data, params)
 
-    def post(self, url: str, data: dict={}, params: dict={}) -> object:
+    def post(self, url: str, data: dict={}, params: dict={}) -> requests.Response:
         """ Отправляет серверу post запрос """
         return self.request('post', url, data, params)
 
-    def send_request(self, url: str, data: dict={}, params: dict={}) -> object:
+    def send_request(self, url: str, data: dict={}, params: dict={}) -> requests.Response:
         """
             Отправляет серверу get запрос если нет данных (data),
             иначе отправляет post запрос.
@@ -116,18 +116,6 @@ class Login:
         else:
             response = self.post(url, data=data, params=params)
         return response
-
-    def server_get(self, url, data={}, params={}):
-        return self.get(url, data, params).text
-
-    def server_post(self, url, data={}, params={}):
-        return self.post(url, data, params).text
-
-    def server_get_request(self, url, data={}, params={}, *args, **kwargs):
-        return self.get(url, data, params, *args, **kwargs)
-
-    def server_post_request(self, url, data={}, params={}, *args, **kwargs):
-        return self.post(url, data, params, *args, **kwargs)
 
     def login(self) -> None:
         """

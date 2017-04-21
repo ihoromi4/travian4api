@@ -61,7 +61,8 @@ class RallyPoint(building.Building):
     def step_2(self, data, troops):
         send_troops_page = 2
         params = {'id': self.id, 'tt': send_troops_page}
-        html = self.village_part.village.login.server_post('build.php', data=data, params=params)
+        response = self.village_part.village.login.post('build.php', data=data, params=params)
+        html = response.text
         soup = bs4.BeautifulSoup(html, 'html5lib')
         div_build = soup.find('div', {'id': 'build'})
         # data = {}
@@ -87,7 +88,9 @@ class RallyPoint(building.Building):
         data['dname'] = div_build.find('input', {'name': 'dname'})['value']
         data['x'] = div_build.find('input', {'name': 'x'})['value']
         data['y'] = div_build.find('input', {'name': 'y'})['value']
-        html = self.village_part.village.login.server_post('build.php', data=data, params=params)
+
+        response = self.village_part.village.login.post('build.php', data=data, params=params)
+        html = response.text
 
     def send_troops(self, pos, troops={'t5': 5}, c=4):
         # c = 2       # Reinforcement

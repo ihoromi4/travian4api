@@ -39,7 +39,8 @@ class Map:
                 }
         """
         params = {'x': pos[0], 'y': pos[1]}
-        html = self.account.login.server_get('position_details.php', params=params)
+        response = self.account.login.get('position_details.php', params=params)
+        html = response.text
         soup = bs4.BeautifulSoup(html, 'html5lib')
         info = position_details.parse_position_details(soup)
         info['pos'] = pos

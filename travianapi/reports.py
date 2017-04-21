@@ -34,7 +34,8 @@ class Reports:
     def get_words(self):
         """ Достает из страницы отчетов слова-маркеры """
 
-        html = self.login.server_get('berichte.php')
+        response = self.login.get('berichte.php')
+        html = response.text
         soup = bs4.BeautifulSoup(html, 'html5lib')
 
         data = {}
@@ -48,16 +49,17 @@ class Reports:
         return data
 
     def mark_readed_report(self, id: int, toggle_state: int = 0):
-        self.login.server_get('berichte.php', params={'id': id, 's': 0, 'toggleState': toggle_state})
+        self.login.get('berichte.php', params={'id': id, 's': 0, 'toggleState': toggle_state})
 
     def delete_report(self, id: int):
-        self.login.server_get('berichte.php', params={'n1': id, 'del': 1})
+        self.login.get('berichte.php', params={'n1': id, 'del': 1})
 
     def __get_reports_table(self, t: int=0, mode: str=None):
         params = {'t': t}
         if mode:
             params['opt'] = mode
-        html = self.login.server_get('berichte.php', params=params)
+        response = self.login.get('berichte.php', params=params)
+        html = response.text
         soup = bs4.BeautifulSoup(html, 'html5lib')
         li_reports = soup.find('li', {'class': 'reports'})
         div_content = li_reports.find('div', {'class': 'speechBubbleContent'})
@@ -87,7 +89,7 @@ class Reports:
             report_name = input_check['name']
             report_id = int(input_check['value'])
             data[report_name] = report_id
-        self.login.server_post('berichte.php', params={'t': 0}, data=data)
+        self.login.post('berichte.php', params={'t': 0}, data=data)
         self.clear()
 
     def mark_as_read_all(self):
@@ -109,7 +111,7 @@ class Reports:
             report_name = input_check['name']
             report_id = int(input_check['value'])
             data[report_name] = report_id
-        self.login.server_post('berichte.php', params={'t': 0}, data=data)
+        self.login.post('berichte.php', params={'t': 0}, data=data)
 
     def get_reports(self):
         table_reports = self.__get_reports_table(0)
