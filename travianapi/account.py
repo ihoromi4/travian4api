@@ -5,13 +5,12 @@ from .travparse import spieler
 
 from . import nations
 from . import login
-from .event import eventmachine
 from .village import village
 from . import reports
 from . import map
 
 
-class Account(eventmachine.EventMachine):
+class Account:
     """ Основной класс API. Агрегирует весь функционал """
 
     def __init__(self, url, name, password, headers=None):
