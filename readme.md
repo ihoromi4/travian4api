@@ -1,8 +1,10 @@
-# Неофициальный API к браузерной игре Travian Legends
+# Travian Legends API
 
-## Зависимости:
+## Unofficial API for Travian Legends browser game for Python3
+
+## Dependencies:
 * requests
 * beautifulsoup
 
-## После установки нужно импортировать:
+## After install use:
 `import travianapi`
