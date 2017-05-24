@@ -5,3 +5,4 @@ venv
 build
 dist
 travianapi.egg-info
+doc/_build
