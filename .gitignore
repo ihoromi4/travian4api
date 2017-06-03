@@ -4,5 +4,5 @@ __pycache__
 venv
 build
 dist
-travianapi.egg-info
+travian4api.egg-info
 doc/_build

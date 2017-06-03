@@ -1,10 +1,11 @@
-# Travian Legends API
+# Travian Legends (v4) API
 
 ## Unofficial API for Travian Legends browser game for Python3
 
 ## Dependencies:
 * requests
+* html5lib
 * beautifulsoup
 
 ## After install use:
-`import travianapi`
+`import travian4api`

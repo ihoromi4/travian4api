@@ -1,28 +1,29 @@
 from setuptools import setup
 
-import travianapi
+import travian4api
 
 setup(
-    name='travianapi',
-    version=travianapi.__version__,
-    url='https://bitbucket.org/igoromi4/travian-legends-api',
+    name='travian4api',
+    version=travian4api.__version__,
+    url='https://bitbucket.org/igoromi4/travian4api',
     license='BSD',
-    author='Igor Omelchenko',
+    author='Ihor Omelchenko',
     author_email='counter3d@gmail.com',
     description='API for Travian Legends browser game',
     platforms='any',
     install_requires=[
         'requests',
+        'html5lib',
         'bs4'
     ],
     packages=[
-        'travianapi',
-        'travianapi.travparse',
-        'travianapi.travparse.parsebuild',
-        'travianapi.village',
-        'travianapi.village.buildings'
+        'travian4api',
+        'travian4api.travparse',
+        'travian4api.travparse.parsebuild',
+        'travian4api.village',
+        'travian4api.village.buildings'
     ],
-    package_dir={'travianapi': 'travianapi'},
+    package_dir={'travian4api': 'travian4api'},
     include_package_data=True,
     zip_safe=False,
     classifiers=[
