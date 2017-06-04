@@ -1,5 +1,6 @@
 import logging
 import time
+from urllib import parse
 
 import requests
 import bs4
@@ -21,7 +22,7 @@ class Login:
     """ Класс реализует подключение к серверу и вход в аккаунт """
 
     def __init__(self, url, name, password, headers=None):
-        self.url = url
+        self.url = self.verify_url(url)
         self.name = name
         self.password = password
 
@@ -42,6 +43,19 @@ class Login:
 
         self.__server_language = None
         self.__game_version = None
+
+    def verify_url(self, url: str):
+        if not type(url) is str:
+            raise TypeError()
+
+        if not url:
+            raise ValueError()
+
+        result = parse.urlparse(url)
+        url = parse.urljoin('http://' + (result.netloc or result.path), '')
+        result = parse.urlparse(url)
+
+        return parse.urljoin('http://' + result.netloc, '/')
 
     @staticmethod
     def _get_session() -> object:

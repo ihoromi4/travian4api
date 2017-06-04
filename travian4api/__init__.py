@@ -3,6 +3,7 @@ import logging
 
 from .account import Account
 from .login import Login
+from .servers import servers
 
 logger = logging.getLogger(__name__)
 
