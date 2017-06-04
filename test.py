@@ -3,11 +3,11 @@ import logging
 logging.basicConfig(format='%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s',
                     level=logging.DEBUG)
 
-from travianapi import account
+from travian4api import account
 
-url = 'http://ts5.travian.ru/'
+url = 'http://ts6.travian.ru/'
 username = 'broo'
-password = 'wA4iN_tYR'
+password = '1234qwer'
 
 acc = account.Account(url, username, password)
 
