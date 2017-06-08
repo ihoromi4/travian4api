@@ -2,6 +2,7 @@ import bs4
 
 from .travparse import dorf1
 from .travparse import spieler
+from .travparse import allianz
 
 from . import nations
 from . import login
@@ -40,11 +41,30 @@ class Account:
         return spieler.parse_rank(soup)
     rank = property(get_rank)
 
-    def get_alliance(self) -> int:
+    def get_alliance_name(self) -> int:
         """ Возвращает id альянса игрока """
         html = self.login.get_html("spieler.php")
         soup = bs4.BeautifulSoup(html, 'html5lib')
         return spieler.parse_alliance(soup)
+    alliance_name = property(get_alliance_name)
+
+    def get_alliance(self) -> dict:
+        params = {'action': 'description'}
+        html = self.login.get_html('allianz.php', params=params)
+        soup = bs4.BeautifulSoup(html, 'html5lib')
+        try:
+            description = allianz.parse_alliance_description(soup)
+        except AttributeError:
+            return None
+
+        params = {'action': 'members'}
+        html = self.login.get_html('allianz.php', params=params)
+        soup = bs4.BeautifulSoup(html, 'html5lib')
+        members = allianz.parse_alliance_members(soup)
+
+        description['members'] = members
+
+        return description
     alliance = property(get_alliance)
 
     def get_villages_amount(self) -> int:
