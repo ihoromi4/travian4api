@@ -96,11 +96,11 @@ class Login:
                     response = self.session.post(url, params=params, data=data, timeout=self.timeout)
                 break
             except requests.exceptions.ConnectionError:
-                print('Attempt %s of %s' % (attempt, REQUEST_MAX_TRIES))
+                logger.debug('Attempt %s of %s' % (attempt, REQUEST_MAX_TRIES))
                 self.new_session()
                 self.login()
             except requests.exceptions.ReadTimeout:
-                print('Attempt %s of %s' % (attempt, REQUEST_MAX_TRIES))
+                logger.debug('Attempt %s of %s' % (attempt, REQUEST_MAX_TRIES))
                 self.new_session()
                 self.login()
             except:
@@ -180,6 +180,10 @@ class Login:
         logger.debug('Login failed')
         return False
 
+    def __call__(self):
+        if not self.login():
+            raise LoginError('Can\'t login. Something is wrong.')
+
     def load_html(self, url: str, params: dict={}, data: dict={}) -> str:
         if not self.loggedin:
             if not self.login():
@@ -217,7 +221,7 @@ class Login:
         if key in self.html_sources:
             html, load_time = self.html_sources[key]
             if time.time() - load_time < self.html_obsolescence_time:
-                print("{} : no obsolescence html".format(url))
+                logger.debug("{} : no obsolescence html".format(url))
                 return html
 
         load_time = time.time()
